@@ -38,7 +38,7 @@ app.layout =dbc.Container(
      ),
      dbc.Row(
          html.H6(
-             [html.Sup("*"),"Net Present Value computed at an internal rate of return of 10% P.A"], className= "text-decoration-underline")
+             [html.Sup("*"),"Net Present Value computed at discount rate of 10% P.A"], className= "text-decoration-underline")
      ), 
      dbc.Row(
          html.H6(
