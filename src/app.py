@@ -56,7 +56,7 @@ app.layout =dbc.Container(
     dbc.Row(
         dbc.Fade(
             dbc.Card([dbc.CardBody(
-                [html.H5("This data analysis project visulises metrics relevant to the yearly energy output of solar PV array of capacities varying from 3kW to 6kW (whose first cost has been subsidised by 50%) and additional metrics relevant to assesing the financial feasibility of the array. This was a part of a larger report presented to project stakeholders elaborating on ways to achieve project goals of affordability and high performance design. The report pertained to the delivery of 20-30 affordable housing units - a part of a larger masterplan for a 17 acre industrial park focused on community development.The site is listed as a place of national importance in the National Registry of Historic places, maintained by the National Parks Service."),
+                [html.H5("This data analysis project visulises metrics relevant to the yearly energy output of solar PV array of capacities varying from 3kW to 6kW (whose first cost has been subsidised by 50%) and additional metrics relevant to assessing the financial feasibility of the array. This was a part of a larger report presented to project stakeholders elaborating on ways to achieve project goals of affordability and high performance design. The report pertained to the delivery of 20-30 affordable housing units - a part of a larger masterplan for a 17 acre industrial park focused on community development.The site is listed as a place of national importance in the National Registry of Historic places, maintained by the National Parks Service."),
                  ]
                     )]
                 
@@ -83,17 +83,17 @@ def update_graph(arg):
     array_6= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
     
     if arg == 1:
-        figure = px.imshow(np.around(array_1,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_1,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"),color_continuous_scale=px.colors.sequential.Pinkyl)
     elif arg == 2:
-        figure = px.imshow(np.around(array_2,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_2,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Peach)
     elif arg == 3:
-        figure = px.imshow(np.around(array_3,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_3,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Oryel)
     elif arg == 4:
-        figure = px.imshow(np.around(array_4,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_4,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Redor)
     elif arg == 5:
-        figure = px.imshow(np.around(array_5,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_5,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Burgyl)
     elif arg == 6:
-        figure = px.imshow(np.around(array_6,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"))
+        figure = px.imshow(np.around(array_6,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Burg)
     return figure
 
 @app.callback(
