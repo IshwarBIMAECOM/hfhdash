@@ -14,7 +14,12 @@ card_1 = dbc.Card([dbc.CardHeader(html.H4(["NPV",html.Sup("*")])),dbc.CardBody(h
 card_2 = dbc.Card([dbc.CardHeader(html.H4(["TLCC", html.Sup("**")])), dbc.CardBody(html.H1(children="",id="TLCC_txt")),dbc.CardFooter("Lifetime costs discounted to yr 0")])
 card_3 = dbc.Card([dbc.CardHeader(html.H4(["Energy gen/yr"])), dbc.CardBody(html.H1(children="", id="EN_txt")),dbc.CardFooter("Energy produced by array in 1 year")])
 card_4 = dbc.Card([dbc.CardHeader(html.H4(["LCOE", html.Sup("+")])), dbc.CardBody(html.H1(children="", id="LCOE_txt")),dbc.CardFooter("Unit cost of energy gen over 30yrs")])
-
+array_1= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "2.94.npy", allow_pickle = True)
+array_2= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.45.npy", allow_pickle=True)
+array_3= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.9.npy", allow_pickle=True)
+array_4= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "4.56.npy", allow_pickle=True)
+array_5= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "5.24.npy", allow_pickle=True)
+array_6= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
 
 app.layout =dbc.Container(
     [dbc.Row(html.H1("50% Subsidy"), style={"padding":"2rem 2rem", "text-align":"center"}),
@@ -68,20 +73,13 @@ app.layout =dbc.Container(
     ]
 )
 
-
 @app.callback(
     Output(component_id= "graf", component_property = "figure"),
     Input(component_id= "Power_Input",component_property = "value")
     )
 def update_graph(arg):
     
-    array_1= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "2.94.npy", allow_pickle = True)
-    array_2= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.45.npy", allow_pickle=True)
-    array_3= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.9.npy", allow_pickle=True)
-    array_4= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "4.56.npy", allow_pickle=True)
-    array_5= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "5.24.npy", allow_pickle=True)
-    array_6= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
-    
+       
     if arg == 1:
         figure = px.imshow(np.around(array_1,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"),color_continuous_scale=px.colors.sequential.Pinkyl)
     elif arg == 2:
@@ -96,157 +94,121 @@ def update_graph(arg):
         figure = px.imshow(np.around(array_6,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Burg)
     return figure
 
-@app.callback(
-Output(component_id="EN_txt", component_property= "children"),
-Input(component_id="graf", component_property="clickData")
-)
-def update_card_EN(arg):
-    coords_z_str = json.dumps(arg["points"][0]["z"], indent=2)
-    return coords_z_str
-
 
 @app.callback(
-Output(component_id="TLCC_txt", component_property= "children"),
-Input(component_id="graf", component_property="clickData"),
-Input(component_id= "Power_Input",component_property = "value")
-)
-def update_card_TLCC(arg1,arg2):
-    
-    coords_x_str = json.dumps(arg1["points"][0]["x"], indent=2)
-    coords_x = int(coords_x_str)
-    coords_y_str = json.dumps(arg1["points"][0]["y"], indent=2)
-    coords_y = int(coords_y_str)
-    TLCC_value = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC.npy", allow_pickle=True)
-    
-    if arg2 == 1:
-    
-        TLCC_value = np.around(TLCC_value[0,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-    
-    elif arg2 == 2:
-    
-        TLCC_value = np.around(TLCC_value[1,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
+    Output(component_id="EN_txt", component_property= "children"),
+    Output(component_id="TLCC_txt", component_property= "children"),
+    Output(component_id="LCOE_txt", component_property= "children"),
+    Output(component_id="NPV_txt", component_property= "children"),
+    [Input(component_id="graf", component_property="clickData"),
+    Input(component_id= "Power_Input",component_property = "value")]
+    )
+def update_all(arg1,arg2):
         
-    elif arg2 == 3:
-    
-        TLCC_value = np.around(TLCC_value[2,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-    
-    elif arg2 == 4:
-    
-        TLCC_value = np.around(TLCC_value[3,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-    
-    elif arg2 == 5:
-    
-        TLCC_value = np.around(TLCC_value[4,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-    
-    elif arg2 == 6:
-    
-        TLCC_value = np.around(TLCC_value[5,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-    
-    return str(TLCC_test)
-
-@app.callback(
-Output(component_id="LCOE_txt", component_property= "children"),
-Input(component_id="graf", component_property="clickData"),
-Input(component_id= "Power_Input",component_property = "value")
-)
-
-def update_card_LCOE(arg1, arg2):
-    
-    coords_x_str = json.dumps(arg1["points"][0]["x"], indent=2)
-    coords_x = int(coords_x_str)
-    coords_y_str = json.dumps(arg1["points"][0]["y"], indent=2)
-    coords_y = int(coords_y_str)
+    TLCC_value = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC.npy", allow_pickle=True)
     LCOE_value =np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE.npy",allow_pickle=True)
-    
-    if arg2==1 :
-        LCOE_value = np.around(LCOE_value[0,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-
-    elif arg2==2 :
-        LCOE_value = np.around(LCOE_value[1,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-    
-    elif arg2==3 :
-        LCOE_value = np.around(LCOE_value[2,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-    
-    elif arg2==4 :
-        LCOE_value = np.around(LCOE_value[3,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-    
-    elif arg2==5 :
-        LCOE_value = np.around(LCOE_value[4,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-    
-    elif arg2==6 :
-        LCOE_value = np.around(LCOE_value[5,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-
-
-    return str(LCOE_test)
-
-@app.callback(
-Output(component_id="NPV_txt", component_property= "children"),
-Input(component_id="graf", component_property="clickData"),
-Input(component_id= "Power_Input",component_property = "value")
-)
-def update_card_NPV(arg1, arg2):
-    
-    coords_x_str = json.dumps(arg1["points"][0]["x"], indent=2)
-    coords_x = int(coords_x_str)
-    coords_y_str = json.dumps(arg1["points"][0]["y"], indent=2)
-    coords_y = int(coords_y_str)
     NPV_value = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"NPV.npy", allow_pickle=True)
     
-    if arg2==1 :
+    
+    if arg2 == 1:
+       
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_1.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[0,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[0,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[0,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
           NPV_out = "POSITIVE NPV"
         else:
           NPV_out = "NEGATIVE NPV"
-
-    elif arg2==2 :
+        
+        
+    
+    
+    elif arg2 == 2:
+        
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_2.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[1,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[1,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[1,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
           NPV_out = "POSITIVE NPV"
         else:
           NPV_out = "NEGATIVE NPV"
-
     
-    elif arg2==3 :
+
+    elif arg2 == 3:
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_3.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[2,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[2,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[2,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
           NPV_out = "POSITIVE NPV"
         else:
           NPV_out = "NEGATIVE NPV"
-
+        
     
-    elif arg2==4 :
+
+    elif arg2 == 4:
+        
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_4.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[3,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[3,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[3,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
           NPV_out = "POSITIVE NPV"
         else:
           NPV_out = "NEGATIVE NPV"
+     
+           
     
-    elif arg2==5 :
+
+    elif arg2 == 5:
+        
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_5.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[4,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[4,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[4,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
           NPV_out = "POSITIVE NPV"
         else:
-          NPV_out = "NEGATIVE NPV"
+          NPV_out = "NEGATIVE NPV"        
+        
     
-    elif arg2==6 :
+
+    elif arg2 == 6:
+        
+        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+        coords_z_str = np.around(array_6.T[coords_x,coords_y],2)
+        TLCC_value = np.around(TLCC_value[5,:,:],2)
+        TLCC_test = TLCC_value.T[coords_x,coords_y]
+        LCOE_value = np.around(LCOE_value[5,:,:],2)
+        LCOE_test = LCOE_value.T[coords_x,coords_y]
         NPV_value = np.around(NPV_value[5,:,:],2)
         NPV_test = NPV_value.T[coords_x,coords_y]
         if NPV_test >= 0:
@@ -254,8 +216,11 @@ def update_card_NPV(arg1, arg2):
         else:
           NPV_out = "NEGATIVE NPV"
 
+        
+    return coords_z_str, TLCC_test, LCOE_test, NPV_out
 
-    return NPV_out
+
+
 @app.callback(
     Output("fade-transition", "is_in"),
     Input("description", "n_clicks"),
@@ -266,6 +231,8 @@ def toggle_fade(n, is_in):
         # Button has never been clicked
         return False
     return not is_in
+
+
 
 
 
