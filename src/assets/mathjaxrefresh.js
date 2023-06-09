@@ -3,10 +3,12 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "850fc5c9",
+   "id": "ba063ef7",
    "metadata": {},
    "outputs": [],
-   "source": []
+   "source": [
+    "setInterval(\"MathJax.Hub.Queue(['Typeset',MathJax.Hub])\",1000);"
+   ]
   }
  ],
  "metadata": {

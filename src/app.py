@@ -1,244 +1,151 @@
-from dash import Dash, dcc, Output, Input, ctx, html, State
+from dash import Dash, dcc, Output, Input, ctx, html, State, MATCH
 import numpy as np
 import pandas as pd
 import dash_bootstrap_components as dbc
 import pathlib as pa
-# from dash_extensions import Download
-# from dash_extensions.snippets import send_file
 import plotly.express as px
 import json
-   
-app = Dash(__name__, external_stylesheets=[dbc.themes.LUX])
-server = app.server
-card_1 = dbc.Card([dbc.CardHeader(html.H4(["NPV",html.Sup("*")])),dbc.CardBody(html.H1(children="", id="NPV_txt")), dbc.CardFooter("Sum of 30yr costs and benefits")])
-card_2 = dbc.Card([dbc.CardHeader(html.H4(["TLCC", html.Sup("**")])), dbc.CardBody(html.H1(children="",id="TLCC_txt")),dbc.CardFooter("Lifetime costs discounted to yr 0")])
-card_3 = dbc.Card([dbc.CardHeader(html.H4(["Energy gen/yr"])), dbc.CardBody(html.H1(children="", id="EN_txt")),dbc.CardFooter("Energy produced by array in 1 year")])
-card_4 = dbc.Card([dbc.CardHeader(html.H4(["LCOE", html.Sup("+")])), dbc.CardBody(html.H1(children="", id="LCOE_txt")),dbc.CardFooter("Unit cost of energy gen over 30yrs")])
-array_1= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "2.94.npy", allow_pickle = True)
-array_2= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.45.npy", allow_pickle=True)
-array_3= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.9.npy", allow_pickle=True)
-array_4= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "4.56.npy", allow_pickle=True)
-array_5= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "5.24.npy", allow_pickle=True)
-array_6= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
 
-app.layout =dbc.Container(
-    [dbc.Row(html.H1("50% Subsidy"), style={"padding":"2rem 2rem", "text-align":"center"}),
-     dbc.Row([dbc.Col(
-        "", width = 6, lg=3, style= {"height" : "100"}),
-              dbc.Col(
-                        dbc.RadioItems(
-                            options = [{"label":"2.94kW", "value":1}, {"label":"3.45kW", "value":2}, {"label":"3.9kW","value":3}, {"label":"4.56kW", "value":4}, {"label":"5.24kW", "value":5}, {"label":"6.03kW", "value":6}], value= 1, id= "Power_Input", inline= True),
-              width =6, lg=9, style= {"height" : "100"}
-              ),
-              dbc.Col("", width =6, lg=1, style= {"height" : "100"})
-             ],align = "end", style= {"height" : "25"}),
-     dbc.Row(
-         dcc.Graph(
-             id="graf", figure={}
-         )
-     ), 
-     dbc.Row(
-        dbc.CardGroup(
-            [card_1, card_2, card_3, card_4,])
-     ),
-     dbc.Row(
-         html.H6(
-             [html.Sup("*"),"Net Present Value computed at discount rate of 10% P.A"], className= "text-decoration-underline")
-     ), 
-     dbc.Row(
-         html.H6(
-             [html.Sup("*"),"TOTAL LIFECYCLE COST"], className= "text-decoration-underline"
-         )
-     ),
-    dbc.Row(
-        html.H6(
-            [html.Sup("*"),"LEVELIZED COST OF ENERGY"], className= "text-decoration-underline"
-        )
-    ),
-    dbc.Row(
-        dbc.Button("show more", class_name = "btn btn-light", id="description", n_clicks=0)
-    ),
-    dbc.Row(
-        dbc.Fade(
-            dbc.Card([dbc.CardBody(
-                [html.H5("This data analysis project visulises metrics relevant to the yearly energy output of solar PV array of capacities varying from 3kW to 6kW (whose first cost has been subsidised by 50%) and additional metrics relevant to assessing the financial feasibility of the array. This was a part of a larger report presented to project stakeholders elaborating on ways to achieve project goals of affordability and high performance design. The report pertained to the delivery of 20-30 affordable housing units - a part of a larger masterplan for a 17 acre industrial park focused on community development.The site is listed as a place of national importance in the National Registry of Historic places, maintained by the National Parks Service."),
-                 ]
-                    )]
-                
-            ), id="fade-transition", is_in=False, appear=False, style={"transition": "opacity 2000ms ease"},timeout=2000
-        )
-    ),
+
+
+tab_1 = html.Div([dbc.Card(dbc.CardBody([html.P("This data analysis project visulises metrics relevant to the yearly energy output of solar PV array of capacities varying from 3kW to 6kW and further, metrics relevant to assessing the financial feasibility of the array when first cost is subsidised by 25, 50 and 75 percent."),html.P("This was a part of a larger report presented to project stakeholders, elaborating on ways to achieve project goals of affordability and high performance design. The report pertained to the delivery of 20-30 affordable housing units - a part of a larger masterplan for a 17 acre industrial park focused on community development.The site is listed as a place of national importance in the National Registry of Historic places, maintained by the National Parks Service.")]),  className= "card border-light"), dbc.Card([
+    dbc.CardHeader(
+        html.H5("Model inputs")), 
+    dbc.CardBody([html.P([html.Span("Solar azimuth", className= "text-primary")," is the horizontal angle with respect to north, of the Sun's position, measured in a clockwise direction"],className="text-muted"), html.P([html.Span("Solar altitude angle", className="text-primary")," is measured between an imaginary line between the observer and the sun and the horizontal plane the observer is standing on."], className="text-muted"),html.P([html.Span("Tilt", className="text-primary"), " is the angle of inclination of the solar panel with respect to the horizontal plane."], className="text-muted"), html.P([html.Span("Array power", className="text-primary")," is the maximum amount of electricity the system can produce in 1 hour under standard testing conditions."],className="text-muted")
+                         ])])])
+
+
+array_0= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "2.94.npy", allow_pickle = True)
+array_1= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.45.npy", allow_pickle=True)
+array_2= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "3.9.npy", allow_pickle=True)
+array_3= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "4.56.npy", allow_pickle=True)
+array_4= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "5.24.npy", allow_pickle=True)
+array_5= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
     
-     
-    ]
-)
+array_list = [array_0, array_1, array_2, array_3, array_4, array_5]
+    
+TLCC_value_50 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC.npy", allow_pickle=True)
+LCOE_value_50 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE.npy",allow_pickle=True)
+TLCC_value_25 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC_25.npy", allow_pickle=True)
+LCOE_value_25 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE_25.npy", allow_pickle=True)
+TLCC_value_75 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC_75.npy", allow_pickle=True)
+LCOE_value_75 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE_75.npy", allow_pickle=True)
+    
+TLCC_list = [TLCC_value_25, TLCC_value_50, TLCC_value_75]
+LCOE_list = [LCOE_value_25, LCOE_value_50, LCOE_value_75]
+    
+app = Dash(__name__, external_stylesheets=[dbc.themes.LUX,dbc.icons.FONT_AWESOME])
+server = app.server
+marks ={
+    0 : "2.94 kW",
+    1 : "3.45 kW",
+    2 : "3.9 kW",
+    3 : "4.56 kW",
+    4 : "5.24 kW",
+    5 : "6.03 kW"
+}
+marks_2 = {
+    0 : "25%",
+    1 : "50%",
+    2 : "75%"
+}
+app.layout= dbc.Container(
+    [dbc.Row([dbc.Col([dbc.Button(html.I(className="fa-sharp fa-solid fa-envelope-open-text fa-3x d-flex align-self-center ms-4"), className="btn btn-light d-flex flex-fill m-0 gap-0", id="offcanvas_button"), dbc.Offcanvas(tab_1, is_open=False, id="offcanvas", title="Project info")], className="d-flex m-0",lg=1), dbc.Col(html.H1(["SOLAR PV ANALYSIS FOR", html.Q("BEHIND THE GATE")], style={"padding":"2rem 2rem", "text-align":"center", "backgroundColor": "#F5F5F5", "margin":"0px"}), lg=11, className="m-0")]
+    ,className="g-0 m-0"),
+    dbc.Row(dbc.Col([html.Div([], id="multi"),html.Div(dbc.Button("add scenario", id="options", n_clicks=0, className = " btn btn-light w-100 d-flex justify-content-center" ), className="gap-0 mt-2 ms-auto w-75 d-flex justify-content-end ")])),
+    ],
+fluid=True)
 
 @app.callback(
-    Output(component_id= "graf", component_property = "figure"),
-    Input(component_id= "Power_Input",component_property = "value")
-    )
-def update_graph(arg):
-    
-       
-    if arg == 1:
-        figure = px.imshow(np.around(array_1,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"),color_continuous_scale=px.colors.sequential.Pinkyl)
-    elif arg == 2:
-        figure = px.imshow(np.around(array_2,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Peach)
-    elif arg == 3:
-        figure = px.imshow(np.around(array_3,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Oryel)
-    elif arg == 4:
-        figure = px.imshow(np.around(array_4,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Redor)
-    elif arg == 5:
-        figure = px.imshow(np.around(array_5,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Burgyl)
-    elif arg == 6:
-        figure = px.imshow(np.around(array_6,2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), color_continuous_scale=px.colors.sequential.Burg)
+    Output("offcanvas", "is_open"),
+    Input("offcanvas_button", "n_clicks"),
+    State("offcanvas","is_open")
+)
+def trigger_offcanvas(n_clicks,is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output({"type":"graf", "index":MATCH}, "figure"),
+    Input({"type":"power_input_3", "index":MATCH}, "value")
+)
+def updategraf(arg):
+    colorlist = ["PinkyL", "Peach", "OryeL", "Redor", "BurgyL", "Burg"]
+    array = [array_0, array_1, array_2, array_3, array_4, array_5]
+    y_label = [y for y in range(10,61)] 
+    figure = px.imshow(np.around(array[arg],2), aspect="auto",origin="lower",labels=dict( x="azimuth",y="altitude", color="kWh"), y=y_label, color_continuous_scale=colorlist[arg])
     return figure
 
-
 @app.callback(
-    Output(component_id="EN_txt", component_property= "children"),
-    Output(component_id="TLCC_txt", component_property= "children"),
-    Output(component_id="LCOE_txt", component_property= "children"),
-    Output(component_id="NPV_txt", component_property= "children"),
-    [Input(component_id="graf", component_property="clickData"),
-    Input(component_id= "Power_Input",component_property = "value")]
-    )
-def update_all(arg1,arg2):
-        
-    TLCC_value = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC.npy", allow_pickle=True)
-    LCOE_value =np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE.npy",allow_pickle=True)
-    NPV_value = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"NPV.npy", allow_pickle=True)
-    
-    
-    if arg2 == 1:
-       
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_1.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[0,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[0,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[0,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"
-        
-        
-    
-    
-    elif arg2 == 2:
-        
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_2.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[1,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[1,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[1,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"
-    
-
-    elif arg2 == 3:
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_3.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[2,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[2,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[2,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"
-        
-    
-
-    elif arg2 == 4:
-        
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_4.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[3,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[3,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[3,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"
-     
-           
-    
-
-    elif arg2 == 5:
-        
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_5.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[4,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[4,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[4,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"        
-        
-    
-
-    elif arg2 == 6:
-        
-        coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
-        coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
-        coords_z_str = np.around(array_6.T[coords_x,coords_y],2)
-        TLCC_value = np.around(TLCC_value[5,:,:],2)
-        TLCC_test = TLCC_value.T[coords_x,coords_y]
-        LCOE_value = np.around(LCOE_value[5,:,:],2)
-        LCOE_test = LCOE_value.T[coords_x,coords_y]
-        NPV_value = np.around(NPV_value[5,:,:],2)
-        NPV_test = NPV_value.T[coords_x,coords_y]
-        if NPV_test >= 0:
-          NPV_out = "POSITIVE NPV"
-        else:
-          NPV_out = "NEGATIVE NPV"
-
-        
-    return coords_z_str, TLCC_test, LCOE_test, NPV_out
-
-
-
-@app.callback(
-    Output("fade-transition", "is_in"),
-    Input("description", "n_clicks"),
-    State("fade-transition", "is_in"),
+    Output("multi", "children"),
+    Input("options", "n_clicks"),
+    State("multi", "children")
 )
-def toggle_fade(n, is_in):
-    if not n:
-        # Button has never been clicked
-        return False
-    return not is_in
+def gen_new_layout(arg, div_children):
+    graf = dbc.Spinner(children =[dcc.Graph(id={"type":"graf", "index":arg}, figure={})], type="grow", size= "lg")
+    array_size_3 = dcc.Slider(0, 5, 1, marks=marks, value=0, id={"type":"power_input_3", "index":arg}, included=False)
+    tilt_input_3 = dbc.InputGroup([dbc.InputGroupText("Input desired Tilt"), dbc.Input(id={"type":"tilt_input_3", "index":arg}, placeholder = f"min 10 max 60", type = "number", min = 10, max=60, value = 30)])
+    azimuth_input_3 = dbc.InputGroup([dbc.InputGroupText("Input desired azimuth"), dbc.Input(id = {"type":"azimuth_input_3", "index":arg}, placeholder = f"min 0 max 360", value = 180)])
+    label_array_size_3=dbc.Label("Choose array power", html_for={"type":"power_input_3", "index":arg})
+    level_of_subsidy_3 = dcc.Slider(0,2,1, value=0, marks = marks_2, id={"type":"subsidy_input_3", "index":arg})
+    label_level_of_subsidy_3=dbc.Label("Choose first cost subsidy", html_for={"type":"subsidy_input_3", "index":arg})
+    card_1 = dbc.Card([dbc.CardHeader([html.H4("TLCC", className="d-inline"),html.Small("($)", className="d-inline justify-content-end")]), dbc.CardBody(html.H1(children="",id={"type":"TLCC_txt","index":arg})),dbc.CardFooter("Lifetime costs discounted to yr 0")])
+    card_2 = dbc.Card([dbc.CardHeader([html.H4("Energy gen/yr", className="d-inline"), html.Small("(kWh)", className="d-inline justify-content-end")]), dbc.CardBody(html.H1(children="", id={"type":"EN_txt", "index":arg})),dbc.CardFooter("Energy produced by array in 1 year")])
+    card_3 = dbc.Card([dbc.CardHeader([html.H4("LCOE", className="d-inline"),html.Small("($/kWh.)", className="d-inline- justify-content-end")]), dbc.CardBody(html.H1(children="", id={"type":"LCOE_txt","index":arg})),dbc.CardFooter("Unit cost of energy gen over 30yrs")])
+    card_4 = dbc.Card(
+        dbc.ListGroup(
+            [dbc.ListGroupItem(
+                html.Div(
+                    [html.P(children="Tilt", className="bg-secondary bg-opacity-50 w-25 d-lg-inline-flex"), html.H4(children="", id={"type":"Tilt","index":arg}, className="w-25 text-lg-center d-lg-inline-flex"), html.Small("click on graph to gen value ", className="w-50 text-lg-end d-lg-inline-flex text-muted")]
+                )
+            ),dbc.ListGroupItem(
+                html.Div(
+                    [html.P(children = "Azimuth", className="bg-secondary bg-opacity-50 w-25 d-lg-inline-flex"), html.H4(children="", id={"type":"Azimuth","index":arg},className= "w-25 text-lg-center d-lg-inline-flex"), html.Small("click on graph to gen value ", className="w-50 text-lg-end d-lg-inline-flex text-muted")]
+                ))
+            ]))
+    
+    
+    new_child = dbc.Row([dbc.Col([html.Br(),html.H4(f"Scenario {str(arg)} inputs", className="d-flex justify-content-center"),html.Br(), html.Br(), html.Br(), html.Br(), card_4, html.Br(), html.Br(), label_array_size_3, array_size_3, html.Br(), label_level_of_subsidy_3, level_of_subsidy_3, html.Br()], width=3, lg=3, style={"background-color":"#f9f9f9"}), dbc.Col([html.Br(), html.H4(f"Scenario {str(arg)}", className="d-flex justify-content-center"), graf, dbc.CardGroup([card_1, card_2,card_3]), html.Br()], width=9, lg=9)])
+    div_children.append(new_child)
+    
+    return div_children
 
 
+@app.callback(
+    
+    Output({"type":"EN_txt", "index":MATCH}, "children"),
+    Output({"type":"TLCC_txt","index":MATCH}, "children"),
+    Output({"type":"LCOE_txt","index":MATCH}, "children"),
+    Output({"type":"Tilt","index":MATCH}, "children"),
+    Output({"type":"Azimuth","index":MATCH}, "children"),
+    Input({"type":"graf", "index":MATCH}, "clickData"),
+    Input({"type":"power_input_3", "index":MATCH},"value"),
+    Input({"type":"subsidy_input_3", "index":MATCH},"value")
+)
+def update_stats(arg1,arg2,arg3):
 
+      
+    for i in range (0,6):
+        for j in range(0,3):
+            
+            if arg2 == i and arg3==j: 
+                coords_x = int(json.dumps(arg1["points"][0]["x"], indent=2))
+                coords_y = int(json.dumps(arg1["points"][0]["y"], indent=2))
+                coords_x_card = str(json.dumps(arg1["points"][0]["x"], indent=2))
+                coords_y_card = str(json.dumps(arg1["points"][0]["y"], indent=2))
+                array = array_list[i]
+                coords_z_str = np.around(array.T[coords_x,coords_y],2)
+                TLCC_Inter = TLCC_list[j]
+                TLCC_value = np.around(TLCC_Inter[i,:,:],2)
+                TLCC_test = TLCC_value.T[coords_x,coords_y]
+                LCOE_Inter = LCOE_list[j]
+                LCOE_value = np.around(LCOE_Inter[i,:,:],2)
+                LCOE_test = LCOE_value.T[coords_x,coords_y]
+                
+          
+    return coords_z_str, TLCC_test, LCOE_test, coords_y_card, coords_x_card
 
-
-
+    
 if __name__=='__main__':
     app.run_server(debug=True)
-
-    # https://github.com/facultyai/dash-bootstrap-components/issues/286
-    
