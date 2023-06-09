@@ -146,6 +146,9 @@ def update_stats(arg1,arg2,arg3):
           
     return coords_z_str, TLCC_test, LCOE_test, coords_y_card, coords_x_card
 
-    
+ 
 if __name__=='__main__':
     app.run_server(debug=True)
+
+    # https://github.com/facultyai/dash-bootstrap-components/issues/286
+    
