@@ -50,7 +50,7 @@ marks_2 = {
     2 : "75%"
 }
 app.layout= dbc.Container(
-    [dbc.Row([dbc.Col([dbc.Button(html.I(className="fa-sharp fa-solid fa-envelope-open-text fa-3x d-flex align-self-center ms-4"), className="btn btn-light d-flex flex-fill m-0 gap-0", id="offcanvas_button"), dbc.Offcanvas(tab_1, is_open=False, id="offcanvas", title="Project info")], className="d-flex m-0",lg=1), dbc.Col(html.H1(["SOLAR PV ANALYSIS FOR", html.Q("BEHIND THE GATE")], style={"padding":"2rem 2rem", "text-align":"center", "backgroundColor": "#F5F5F5", "margin":"0px"}), lg=11, className="m-0")]
+    [dbc.Row([ dbc.Col(html.H1(["SOLAR PV ANALYSIS FOR", html.Q("BEHIND THE GATE")], style={"padding":"2rem 2rem", "text-align":"center", "backgroundColor": "#F5F5F5", "margin":"0px"}), lg=12, className="m-0")]
     ,className="g-0 m-0"),
     dbc.Row(dbc.Col([html.Div([], id="multi"),html.Div(dbc.Button("add scenario", id="options", n_clicks=0, className = " btn btn-light w-100 d-flex justify-content-center" ), className="gap-0 mt-2 ms-auto w-75 d-flex justify-content-end ")])),
     ],
@@ -146,7 +146,7 @@ def update_stats(arg1,arg2,arg3):
           
     return coords_z_str, TLCC_test, LCOE_test, coords_y_card, coords_x_card
 
- 
+    
 if __name__=='__main__':
     app.run_server(debug=True)
 
