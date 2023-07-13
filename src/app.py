@@ -23,7 +23,27 @@ array_4= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "5.24.npy", al
 array_5= np.load(pa.PurePath(pa.Path(__name__)).parent / "data" / "6.03.npy", allow_pickle=True)
     
 array_list = [array_0, array_1, array_2, array_3, array_4, array_5]
-    
+# items = [{"key":"1",
+#          "src":"/data/img1.jpg",
+#          "header":"Step 1",
+#          "caption":"click on graph area to start analysis"},
+#         {"key":"2",
+#         "src":"/data/img2.jpg",
+#         "header":"Step 2",
+#         "caption":"this populates cards with data corresponding to clicked data point"},
+#         {"key":"3",
+#         "src":"data/img3.jpg",
+#         "header":"Step 3",
+#         "caption":"interact with array power slider to view analysis of different capacities of solar PV array"},
+#         {"key":"4",
+#         "src":"data/img4.jpg",
+#         "header":"Step 4",
+#         "capiton":"interact with subsidy slider to view effects of first cost subsidy analysis at same array power"},
+#         {"key":"5",
+#         "src":"data/img5.jpg",
+#         "header":"Step 5",
+#         "caption":"click on add scenario to initialise an additional instance, reload page to clear additional analysis and start fresh. "}]    
+
 TLCC_value_50 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC.npy", allow_pickle=True)
 LCOE_value_50 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"LCOE.npy",allow_pickle=True)
 TLCC_value_25 = np.load(pa.PurePath(pa.Path(__name__)).parent / "data" /"TLCC_25.npy", allow_pickle=True)
@@ -52,14 +72,27 @@ marks_2 = {
 app.layout= dbc.Container(
     [dbc.Row([ dbc.Col(html.H1(["SOLAR PV ANALYSIS FOR", html.Q("BEHIND THE GATE")], style={"padding":"2rem 2rem", "text-align":"center", "backgroundColor": "#F5F5F5", "margin":"0px"}), lg=12, className="m-0")]
     ,className="g-0 m-0"),
+     dbc.Row([dbc.Col([dbc.Button("project description", id = "pd", n_clicks=0, className="flex-fill"), dbc.Modal([dbc.ModalBody(tab_1)], id="modal", is_open=False)], lg=12, width=12, className= "d-flex")]),
     dbc.Row(dbc.Col([html.Div([], id="multi"),html.Div(dbc.Button("add scenario", id="options", n_clicks=0, className = " btn btn-light w-100 d-flex justify-content-center" ), className="gap-0 mt-2 ms-auto w-75 d-flex justify-content-end ")])),
     ],
 fluid=True)
 
+     
 @app.callback(
-    Output("offcanvas", "is_open"),
-    Input("offcanvas_button", "n_clicks"),
-    State("offcanvas","is_open")
+    Output("carousel", "is_open"),
+    Input("c_button", "n_clicks"),
+    State("carousel","is_open")
+)
+def trigger_offcanvas(n_clicks,is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+     
+     
+@app.callback(
+    Output("modal", "is_open"),
+    Input("pd", "n_clicks"),
+    State("modal","is_open")
 )
 def trigger_offcanvas(n_clicks,is_open):
     if n_clicks:
@@ -146,7 +179,7 @@ def update_stats(arg1,arg2,arg3):
           
     return coords_z_str, TLCC_test, LCOE_test, coords_y_card, coords_x_card
 
-    
+   
 if __name__=='__main__':
     app.run_server(debug=True)
 
